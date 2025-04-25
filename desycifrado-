@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Cifrador DES</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script>
+    window.addEventListener("message", function(event) {
+      const mensajeOriginal = event.data;
+
+      // Aquí haces tu cifrado, por ejemplo:
+      const mensajeCifrado = mensajeOriginal.split('').reverse().join(''); // ejemplo: texto invertido
+
+      // Manda el resultado de vuelta a Thunkable
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(mensajeCifrado);
+      } else {
+        console.log("Resultado (ejemplo de inversión):", mensajeCifrado);
+      }
+    });
+
+    function cifrar(mensaje, clave) {
+      return CryptoJS.DES.encrypt(mensaje, clave).toString();
+    }
+
+    function descifrar(textoCifrado, clave) {
+      var bytes = CryptoJS.DES.decrypt(textoCifrado, clave);
+      return bytes.toString(CryptoJS.enc.Utf8);
+    }
+
+    function procesar(op, mensaje, clave) {
+      var resultado = '';
+      if (op === 'cifrar') {
+        resultado = cifrar(mensaje, clave);
+      } else if (op === 'descifrar') {
+        resultado = descifrar(mensaje, clave);
+      }
+      // Enviamos el resultado de vuelta a Thunkable
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(resultado);
+      } else {
+        console.log("Resultado (" + op + "):", resultado);
+      }
+    }
+
+    window.onload = function () {
+      document.addEventListener('message', function (event) {
+        try {
+          var data = JSON.parse(event.data);
+          procesar(data.op, data.mensaje, data.clave);
+        } catch (e) {
+          console.error("Error al procesar el mensaje:", e);
+        }
+      });
+    };
+  </script>
+</head>
+<body>
+  <h3>Procesando mensaje...</h3>
+</body>
+</html>
