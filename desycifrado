@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Cifrador DES</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script>
+    function cifrar(mensaje, clave) {
+      return CryptoJS.DES.encrypt(mensaje, clave).toString();
+    }
+
+    function descifrar(textoCifrado, clave) {
+      var bytes = CryptoJS.DES.decrypt(textoCifrado, clave);
+      return bytes.toString(CryptoJS.enc.Utf8);
+    }
+
+    function procesar(op, mensaje, clave) {
+      var resultado = '';
+      if (op === 'cifrar') {
+        resultado = cifrar(mensaje, clave);
+      } else if (op === 'descifrar') {
+        resultado = descifrar(mensaje, clave);
+      }
+      // Enviamos el resultado de vuelta a Thunkable
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({ resultado: resultado }));
+      } else {
+        console.log("Resultado (" + op + "):", resultado);
+      }
+    }
+
+    function ejecutarCifrado() {
+      const mensaje = document.getElementById('mensaje').value;
+      const clave = document.getElementById('clave').value;
+      procesar('cifrar', mensaje, clave);
+    }
+
+    function ejecutarDescifrado() {
+      const mensajeCifrado = document.getElementById('mensaje').value;
+      const clave = document.getElementById('clave').value;
+      procesar('descifrar', mensajeCifrado, clave);
+    }
+  </script>
+</head>
+<body>
+  <h3>Cifrador DES</h3>
+  <div>
+    <label for="mensaje">Mensaje:</label>
+    <input type="text" id="mensaje" />
+  </div>
+  <div>
+    <label for="clave">Clave:</label>
+    <input type="text" id="clave" />
+  </div>
+  <button onclick="ejecutarCifrado()">Cifrar</button>
+  <button onclick="ejecutarDescifrado()">Descifrar</button>
+</body>
+</html>
